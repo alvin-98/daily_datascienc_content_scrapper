@@ -29,17 +29,21 @@ There are numerous resource to learn and keep updated with the rapid development
 ## Fact and dimension tables
 
 ### Twitter Tables
-**tweets (fact table):**	tweetId, tweetDate, userId,	conversationId,	retweetedTweet, quotedTweet, inReplyToTweetId, mentionedUsers, hashtags, place <br>
-**twitter_users (dimension table):** userId, username, displayname,	description, profileCreated, followersCount, friendsCount, statusesCount, favouritesCount, listedCount,  mediaCount, location, linkUrl <br>
-**tweet_stats (dimension table):** tweetId, replyCount, retweetCount, likeCount, quoteCount <br>
-**tweet_content (dimension table):** tweetId, content, language, outlinks, media, hashtags, url <br>
-**tweet_time (dimension table):** tweetDate, hour, day, week, month, year, weekday <br>
+- **tweets (fact table):**	tweetId, tweetDate, userId,	conversationId,	retweetedTweet, quotedTweet, inReplyToTweetId, mentionedUsers, hashtags, place <br>
+- **twitter_users (dimension table):** userId, username, displayname,	description, profileCreated, followersCount, friendsCount, statusesCount, favouritesCount, listedCount,  mediaCount, location, linkUrl <br>
+- **tweet_stats (dimension table):** tweetId, replyCount, retweetCount, likeCount, quoteCount <br>
+- **tweet_content (dimension table):** tweetId, content, language, outlinks, media, hashtags, url <br>
+- **tweet_time (dimension table):** tweetDate, hour, day, week, month, year, weekday <br>
 
 ### Youtube Video Tables
-**youtube_videos (fact table):** videoId, publishedAt, channelId <br>
-**youtube_video_content (dimension table):** videoId, title, description,	duration,	dimension, definition, caption,	licensedContent, contentRating,	projection <br>
-**youtube_video_statistics (dimension table):** videoId, viewCount, likeCount, favoriteCount, commentCount <br>
-**youtube_channel (dimension table):** channelId, channelTitle, channelDescription, channelCreatedOn, channelTopicCategories, channelViewCount, channelSubscriberCount, channelHiddenSubscriberCount, channelVideoCount <br>
-**youtube_videos_time (dimension table):** publishedAt, hour, day, week, month, year, weekday 
+- **youtube_videos (fact table):** videoId, publishedAt, channelId <br>
+- **youtube_video_content (dimension table):** videoId, title, description,	duration,	dimension, definition, caption,	licensedContent, contentRating,	projection <br>
+- **youtube_video_statistics (dimension table):** videoId, viewCount, likeCount, favoriteCount, commentCount <br>
+- **youtube_channel (dimension table):** channelId, channelTitle, channelDescription, channelCreatedOn, channelTopicCategories, channelViewCount, channelSubscriberCount, channelHiddenSubscriberCount, channelVideoCount <br>
+- **youtube_videos_time (dimension table):** publishedAt, hour, day, week, month, year, weekday 
 
+## Note
+1. Add in your Youtube API key and AWS credentials to the config file 
+2. Create an S3 bucket 'dsc-staging' and folders named 'youtubevideos_data' and 'tweet_data' to store data from these two sources respectively
+3. Spin up a Redshift cluster and add a connection named 'redshift' using airflow ui
 
