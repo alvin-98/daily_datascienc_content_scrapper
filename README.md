@@ -29,17 +29,17 @@ There are numerous resource to learn and keep updated with the rapid development
 ## Fact and dimension tables
 
 ### Twitter Tables
-tweets (fact table):	tweetId, tweetDate, userId,	conversationId,	retweetedTweet, quotedTweet, inReplyToTweetId, mentionedUsers, hashtags, place
-twitter_users (dimension table): userId, username, displayname,	description, profileCreated, followersCount, friendsCount, statusesCount, favouritesCount, listedCount,  mediaCount, location, linkUrl
-tweet_stats (dimension table): tweetId, replyCount, retweetCount, likeCount, quoteCount
-tweet_content (dimension table): tweetId, content, language, outlinks, media, hashtags, url
-tweet_time (dimension table): tweetDate, hour, day, week, month, year, weekday
+**tweets (fact table):**	tweetId, tweetDate, userId,	conversationId,	retweetedTweet, quotedTweet, inReplyToTweetId, mentionedUsers, hashtags, place <br>
+**twitter_users (dimension table):** userId, username, displayname,	description, profileCreated, followersCount, friendsCount, statusesCount, favouritesCount, listedCount,  mediaCount, location, linkUrl <br>
+**tweet_stats (dimension table):** tweetId, replyCount, retweetCount, likeCount, quoteCount <br>
+**tweet_content (dimension table):** tweetId, content, language, outlinks, media, hashtags, url <br>
+**tweet_time (dimension table):** tweetDate, hour, day, week, month, year, weekday <br>
 
 ### Youtube Video Tables
-youtube_videos (fact table): videoId, publishedAt, channelId
-youtube_video_content (dimension table): videoId, title, description,	duration,	dimension, definition, caption,	licensedContent, contentRating,	projection
-youtube_video_statistics (dimension table): videoId, viewCount, likeCount, favoriteCount, commentCount
-youtube_channel (dimension table): channelId, channelTitle, channelDescription, channelCreatedOn, channelTopicCategories, channelViewCount, channelSubscriberCount, channelHiddenSubscriberCount, channelVideoCount
-youtube_videos_time (dimension table): publishedAt, hour, day, week, month, year, weekday
+**youtube_videos (fact table):** videoId, publishedAt, channelId <br>
+**youtube_video_content (dimension table):** videoId, title, description,	duration,	dimension, definition, caption,	licensedContent, contentRating,	projection <br>
+**youtube_video_statistics (dimension table):** videoId, viewCount, likeCount, favoriteCount, commentCount <br>
+**youtube_channel (dimension table):** channelId, channelTitle, channelDescription, channelCreatedOn, channelTopicCategories, channelViewCount, channelSubscriberCount, channelHiddenSubscriberCount, channelVideoCount <br>
+**youtube_videos_time (dimension table):** publishedAt, hour, day, week, month, year, weekday 
 
 
