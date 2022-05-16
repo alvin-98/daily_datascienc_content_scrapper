@@ -40,19 +40,19 @@ class StageToRedshiftOperator(BaseOperator):
         
 
     def execute(self, context):
-        
+
         redshift_hook = PostgresHook(postgres_conn_id=self.redshift_conn_id)
         s3_path = f"s3://{self.s3_bucket}/{self.s3_key}"
         final_sql_string = StageToRedshiftOperator.staging_sql_template.format(
             table = self.table,
-            s3_source = self.s3_path,
+            s3_source = s3_path,
             access_key = self.access_key,
             secret_key = self.secret_key,
             region = self.region,
             path_file = self.json_path
         )
         
-        self.log.info(f'Copying data from {self.s3_path} to {self.table} ')
+        self.log.info(f'Copying data from {s3_path} to {self.table} ')
         redshift_hook.run(final_sql_string)
         
 

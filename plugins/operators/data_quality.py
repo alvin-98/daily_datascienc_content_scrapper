@@ -21,7 +21,7 @@ class DataQualityOperator(BaseOperator):
         
         num_errors = 0
         failed_queries = []
-        for criteria in qc:
+        for criteria in self.qc:
             query = criteria['query']
             expectation = criteria['expectation']
             
