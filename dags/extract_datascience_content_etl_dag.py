@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 import os
 from airflow import DAG
 from airflow.models import Variable
-from airflow.contrib.hooks.aws_hook import AwsHook
+from airflow.providers.amazon.aws.hooks.base_aws import AwsBaseHook
 from airflow.operators.dummy_operator import DummyOperator
 
 from operators.stage_redshift import StageToRedshiftOperator
@@ -17,9 +17,10 @@ from airflow.operators.python_operator import PythonOperator
 import extract_socials
  
  
-AWS_KEY = AwsHook('aws_credentials').get_credentials().access_key
-AWS_SECRET = AwsHook('aws_credentials').get_credentials().secret_key
+AWS_KEY = AwsBaseHook('aws_credentials', client_type='s3').get_credentials().access_key
+AWS_SECRET = AwsBaseHook('aws_credentials', client_type='s3').get_credentials().secret_key
 
+TRUNCATE_MODE = True 
 
 default_args = {
     'owner': 'alvinv',
@@ -104,7 +105,7 @@ load_twitter_users_dimension_table = LoadDimensionOperator(
     table='twitter_users',
     redshift_conn_id='redshift',
     select_stmt=SqlQueries.twitter_users_table_insert,
-    truncate_mode=True
+    truncate_mode=TRUNCATE_MODE
 )
 
 
@@ -114,7 +115,7 @@ load_tweet_stats_dimension_table = LoadDimensionOperator(
     table='tweet_stats',
     redshift_conn_id='redshift',
     select_stmt=SqlQueries.tweet_stats_table_insert,
-    truncate_mode=True
+    truncate_mode=TRUNCATE_MODE
 )
 
 
@@ -124,7 +125,7 @@ load_tweet_content_dimension_table = LoadDimensionOperator(
     table='tweet_content',
     redshift_conn_id='redshift',
     select_stmt=SqlQueries.tweet_content_table_insert,
-    truncate_mode=True
+    truncate_mode=TRUNCATE_MODE
 )
 
 
@@ -134,7 +135,7 @@ load_tweet_time_dimension_table = LoadDimensionOperator(
     table='tweet_time',
     redshift_conn_id='redshift',
     select_stmt=SqlQueries.tweet_time_table_insert,
-    truncate_mode=True
+    truncate_mode=TRUNCATE_MODE
 )
 
 
@@ -153,7 +154,7 @@ load_youtube_video_content_dimension_table = LoadDimensionOperator(
     table='youtube_video_content',
     redshift_conn_id='redshift',
     select_stmt=SqlQueries.youtube_video_content_table_insert,
-    truncate_mode=True
+    truncate_mode=TRUNCATE_MODE
 )
 
 
@@ -163,7 +164,7 @@ load_youtube_video_statistics_dimension_table = LoadDimensionOperator(
     table='youtube_video_statistics',
     redshift_conn_id='redshift',
     select_stmt=SqlQueries.youtube_video_statistics_table_insert,
-    truncate_mode=True
+    truncate_mode=TRUNCATE_MODE
 )
 
 
@@ -173,7 +174,7 @@ load_youtube_channel_dimension_table = LoadDimensionOperator(
     table='youtube_channel',
     redshift_conn_id='redshift',
     select_stmt=SqlQueries.youtube_channel_table_insert,
-    truncate_mode=True
+    truncate_mode=TRUNCATE_MODE
 )
 
 
@@ -183,7 +184,7 @@ load_youtube_videos_time_dimension_table = LoadDimensionOperator(
     table='youtube_videos_time',
     redshift_conn_id='redshift',
     select_stmt=SqlQueries.youtube_videos_time_table_insert,
-    truncate_mode=True
+    truncate_mode=TRUNCATE_MODE
 )
 
 
@@ -191,17 +192,18 @@ run_quality_checks_pkeys = DataQualityOperator(
     task_id='Run_data_quality_checks_pkeys',
     dag=dag,
     qc = [
-        {'query':'SELECT COUNT(*) FROM public.tweets WHERE tweetId IS NULL','expectation':0},
-        {'query':'SELECT COUNT(*) FROM public.twitter_users WHERE userId IS NULL','expectation':0},
-        {'query':'SELECT COUNT(*) FROM public.tweet_stats WHERE tweetId IS NULL','expectation':0},
-        {'query':'SELECT COUNT(*) FROM public.tweet_content WHERE tweetId IS NULL','expectation':0},
-        {'query':'SELECT COUNT(*) FROM public.tweet_time WHERE tweetDate IS NULL','expectation':0},
-        {'query':'SELECT COUNT(*) FROM public.youtube_videos WHERE videoId IS NULL','expectation':0},
-        {'query':'SELECT COUNT(*) FROM public.youtube_video_content WHERE videoId IS NULL','expectation':0},
-        {'query':'SELECT COUNT(*) FROM public.youtube_video_statistics WHERE videoId IS NULL','expectation':0},
-        {'query':'SELECT COUNT(*) FROM public.youtube_channel WHERE channelId IS NULL','expectation':0},
-        {'query':'SELECT COUNT(*) FROM public.youtube_videos_time WHERE publishedAt IS NULL','expectation':0},
-    ]
+        {'query':'SELECT COUNT(*) FROM public.tweets WHERE tweet_id IS NULL','expectation':0},
+        {'query':'SELECT COUNT(*) FROM public.twitter_users WHERE user_id IS NULL','expectation':0},
+        {'query':'SELECT COUNT(*) FROM public.tweet_stats WHERE tweet_id IS NULL','expectation':0},
+        {'query':'SELECT COUNT(*) FROM public.tweet_content WHERE tweet_id IS NULL','expectation':0},
+        {'query':'SELECT COUNT(*) FROM public.tweet_time WHERE tweet_date IS NULL','expectation':0},
+        {'query':'SELECT COUNT(*) FROM public.youtube_videos WHERE video_id IS NULL','expectation':0},
+        {'query':'SELECT COUNT(*) FROM public.youtube_video_content WHERE video_id IS NULL','expectation':0},
+        {'query':'SELECT COUNT(*) FROM public.youtube_video_statistics WHERE video_id IS NULL','expectation':0},
+        {'query':'SELECT COUNT(*) FROM public.youtube_channel WHERE channel_id IS NULL','expectation':0},
+        {'query':'SELECT COUNT(*) FROM public.youtube_videos_time WHERE published_at IS NULL','expectation':0},
+    ],
+    redshift_conn_id='redshift'
 )
 
 
@@ -209,28 +211,29 @@ run_quality_checks_content = DataQualityOperator(
     task_id='Run_data_quality_checks_content',
     dag=dag,
     qc = [
-        {'query':'SELECT COUNT(*) FROM public.tweets WHERE userId IS NULL','expectation':0},
-        {'query':'SELECT COUNT(*) FROM public.tweets WHERE tweetDate IS NULL','expectation':0},
+        {'query':'SELECT COUNT(*) FROM public.tweets WHERE user_id IS NULL','expectation':0},
+        {'query':'SELECT COUNT(*) FROM public.tweets WHERE tweet_date IS NULL','expectation':0},
         {'query':'SELECT COUNT(*) FROM public.tweet_content WHERE content IS NULL','expectation':0},
-        {'query':'SELECT COUNT(*) FROM public.youtube_videos WHERE publishedAt IS NULL','expectation':0},
-        {'query':'SELECT COUNT(*) FROM public.youtube_videos WHERE channelId IS NULL','expectation':0},
+        {'query':'SELECT COUNT(*) FROM public.youtube_videos WHERE published_at IS NULL','expectation':0},
+        {'query':'SELECT COUNT(*) FROM public.youtube_videos WHERE channel_id IS NULL','expectation':0},
         {'query':'SELECT COUNT(*) FROM public.youtube_video_content WHERE title IS NULL','expectation':0},
         {'query':'SELECT COUNT(*) FROM public.youtube_video_content WHERE duration IS NULL','expectation':0},
-        {'query':'SELECT COUNT(*) FROM public.youtube_channel WHERE channelTitle IS NULL','expectation':0},
-        {'query':'SELECT COUNT(*) FROM public.youtube_videos_time WHERE publishedAt IS NULL','expectation':0},
-    ]
+        {'query':'SELECT COUNT(*) FROM public.youtube_channel WHERE channel_title IS NULL','expectation':0},
+        {'query':'SELECT COUNT(*) FROM public.youtube_videos_time WHERE published_at IS NULL','expectation':0},
+    ],
+    redshift_conn_id='redshift'
 )
 
 
 end_operator = DummyOperator(task_id='Stop_execution',  dag=dag)
 
 
-start_operator >> create_tables \
-               >> [python_extract_tweets_task, python_extract_youtubevideos_task] \
+start_operator >> [python_extract_tweets_task, python_extract_youtubevideos_task] \
+               >> create_tables \
                >> [stage_tweets_to_redshift, stage_youtubevideos_to_redshift] \
-               >> [load_tweets_table, load_youtube_videos_table] \
-               >> [load_twitter_users_dimension_table, load_tweet_stats_dimension_table, load_tweet_content_dimension_table, load_tweet_time_dimension_table,
-               load_youtube_video_content_dimension_table, load_youtube_channel_dimension_table, load_youtube_videos_time_dimension_table, load_youtube_video_statistics_dimension_table] \
+               >> load_tweets_table \
+               >> load_youtube_videos_table \
+               >> [load_twitter_users_dimension_table, load_tweet_stats_dimension_table, load_tweet_content_dimension_table, load_tweet_time_dimension_table, load_youtube_video_content_dimension_table, load_youtube_channel_dimension_table, load_youtube_videos_time_dimension_table, load_youtube_video_statistics_dimension_table] \
                >> run_quality_checks_pkeys \
                >> run_quality_checks_content \
                >> end_operator
