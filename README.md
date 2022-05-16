@@ -19,7 +19,7 @@ There are numerous resource to learn and keep updated with the rapid development
 ## Performance under alternate scenarios
 1. The data was increased 100x
 - The S3 store and Redshift are scalable as the requirements increases, however, there will be a cost incurred based the data stored and time for which the clusters have to run. Therefore, it is better to create and shutdown Redshift clusters after usage.
-- The current setup brings in 1 million tweets and 10 thousand youtube videos every day and the Redshift facts and dimension tables are truncated every time before loading in data.
+- The current setup brings in 1 thousand tweets and 100 youtube videos every day and the Redshift facts and dimension tables are truncated every time before loading in data. These numbers were chosen keeping the limits of respective api quotas in mind as well as to extract a good quality of information from both sources.
 
 2. The database needs to be accessed by 100+ people
 - The extraction part of the pipeline can be turned into an API for anyone to use, perhaps using a service like AWS Lambda.
@@ -27,9 +27,9 @@ There are numerous resource to learn and keep updated with the rapid development
 - Redshift has a concurrency scaling option using which virtually facilitates unlimited concurrent users and concurrent queries with fast performance.
 
 ## Note
-1. Add in your Youtube API key and AWS credentials to the config file 
+1. Add in your Youtube API key and AWS credentials as variables and connections in airflow. 
 2. Create an S3 bucket 'dsc-staging' and folders named 'youtubevideos_data' and 'tweet_data' to store data from these two sources respectively
-3. Spin up a Redshift cluster and add a connection named 'redshift' using airflow ui
+3. Spin up a Redshift cluster and add a connection named 'redshift' using airflow.
 
 ## Fact and dimension tables (Data Dictionary)
 
@@ -83,7 +83,7 @@ hour | int8 | 8 bytes | - | hour when tweet was posted |
 day | int8 | 8 bytes | - | day of month when tweet was posted |
 week | int8 | 8 bytes | - | week when tweet was posted |
 month | varchar(256) | 256 bytes | - | month when tweet was posted |
-year | int8 | 8 bytes | 8 bytes | - | year when tweet was posted |
+year | int8 | 8 bytes | - | year when tweet was posted |
 weekday | varchar(256) | 256 bytes | - | day of week when tweet was posted |
 
 #### Youtube Videos Table (Facts Table)
@@ -134,18 +134,18 @@ hour | int8 | 8 bytes | - | hour when video was posted |
 day | int8 | 8 bytes | - | day of month when video was posted |
 week | int8 | 8 bytes | - | week when video was posted |
 month | varchar(256) | 256 bytes | - | month when video was posted |
-year | int8 | 8 bytes | 8 bytes | - | year when video was posted |
+year | int8 | 8 bytes | - | year when video was posted |
 weekday | varchar(256) | 256 bytes | - | day of week when video was posted |
  
 
 
 ### Relationships between the data tables
 
-
-
+![Twitter Table Relationships](https://github.com/alvin-98/daily_datascience_content_scrapper/blob/main/images/tweet_table_schema.PNG)
+![Youtube Table Relationships](https://github.com/alvin-98/daily_datascience_content_scrapper/blob/main/images/youtube_table_schema.PNG)
 ## Sample Query
 
-The table schema was designed to make it effiecient to extract and serve tweet content and use additional filters, based on popularity and time period, if needed to serve best tweets.
+The table schema was designed to make it effiecient to extract and serve tweet content and use additional filters, based on popularity and time period, if needed to serve best tweets. Therefore, the entities - users, content, etc - are kept as separate dimensions. This will result in an optimal query for querying tweets and apply conditions based on dimensions.
 
 - Query to extract the top tweets shared in the data science domain in the past month
 ```
@@ -160,7 +160,7 @@ ORDER BY ts.retweet_count DESC
 LIMIT 10
 ```
 Result (partial image as too large to take a single screenshot on redshift):
-
+![Query Result](https://github.com/alvin-98/daily_datascience_content_scrapper/blob/main/images/sample_query_result_snapshot.PNG)
 
 ### A look at the amount of data in tables
 
@@ -178,4 +178,5 @@ where tab.table_type = 'BASE TABLE'
       and tinf.tbl_rows > 1
 order by tinf.tbl_rows desc;
 ```
-
+![Twitter Table Statistics](https://github.com/alvin-98/daily_datascience_content_scrapper/blob/main/images/twitter_tables_stats.PNG)
+![Youtube Table Statistics](https://github.com/alvin-98/daily_datascience_content_scrapper/blob/main/images/youtube_tables_stats.PNG)
